@@ -1,10 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <script>
+      try {
+        const stored = localStorage.getItem('oddletics-theme')
+        document.documentElement.dataset.theme = stored === 'dark' || (!stored && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'
+      } catch {}
+    </script>
+    <link rel="icon" type="image/png" sizes="1024x1024" href="/app-icon.png" />
+    <link rel="apple-touch-icon" href="/app-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>oddletics_landingpage</title>
+    <meta name="theme-color" content="#ffd166" />
+    <meta name="description" content="怪运会 Oddletics，一场不太正经的运动会。随手画个小家伙，送它参加 9 个趣味运动项目。没有标准画法，只有意想不到的快乐。" />
+    <meta property="og:title" content="怪运会 Oddletics — 腿脚潦草，成绩挺好。" />
+    <meta property="og:description" content="把想象力放上跑道。画出你的原创选手，一起参加这场怪有意思的运动会。" />
+    <meta property="og:type" content="website" />
+    <title>怪运会 Oddletics — 腿脚潦草，成绩挺好。</title>
   </head>
   <body>
     <div id="app"></div>
