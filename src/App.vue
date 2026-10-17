@@ -11,6 +11,7 @@ import {useSitePreferences} from './composables/preferences'
 import SportsPlayground from './components/SportsPlayground.vue'
 import ThemeStadiumTransition from './components/ThemeStadiumTransition.vue'
 import {downloadUrls, type DownloadPlatform} from './data/downloads'
+import {getDownloadPlatforms} from './data/download-platforms'
 import type {MessageKey} from './data/messages'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -24,6 +25,7 @@ const isScrolled = ref(false)
 const downloadDialog = ref<HTMLDialogElement>()
 const dialogTrigger = ref<HTMLElement | null>(null)
 const pendingPlatform = ref<DownloadPlatform>('ios')
+const visibleDownloadPlatforms = getDownloadPlatforms(typeof navigator === 'undefined' ? undefined : navigator)
 const faqs: { q: MessageKey; a: MessageKey }[] = [
   {q: 'faq1q', a: 'faq1a'}, {q: 'faq2q', a: 'faq2a'},
   {q: 'faq3q', a: 'faq3a'}, {q: 'faq4q', a: 'faq4a'},
@@ -335,7 +337,9 @@ onBeforeUnmount(() => {
                 stroke-linecap="round"/></svg></span></h1>
             <p class="hero-description multiline">{{ t('heroDescription') }}</p>
             <div class="hero-actions">
-              <DownloadBadge platform="ios" @unavailable="showDownload"/>
+              <div class="hero-store-buttons" :class="{'has-multiple': visibleDownloadPlatforms.length > 1}">
+                <DownloadBadge v-for="platform in visibleDownloadPlatforms" :key="platform" :platform="platform" @unavailable="showDownload"/>
+              </div>
               <a class="hero-secondary" href="#play"><span class="play-icon" aria-hidden="true">↗</span><span class="hero-secondary-label">{{ t('navPlay') }}</span></a></div>
             <div class="hero-footnote"><span class="tiny-doodles"><DoodleAthlete kind="frog" color="#27b77c"/><DoodleAthlete
                 kind="dog"/><DoodleAthlete kind="blob" color="#bdc6f1"/></span><span>{{
@@ -417,8 +421,7 @@ onBeforeUnmount(() => {
             }}</span>{{ t('finalTitle3') }}</h2>
           <p class="final-description" data-section-layer="download-copy">{{ t('finalText') }}</p>
           <div class="final-store-buttons">
-            <DownloadBadge platform="ios" @unavailable="showDownload"/>
-            <DownloadBadge platform="harmony" @unavailable="showDownload"/>
+            <DownloadBadge v-for="platform in visibleDownloadPlatforms" :key="platform" :platform="platform" @unavailable="showDownload"/>
           </div>
           <p class="download-status">{{
               t(downloadUrls.ios || downloadUrls.harmony ? 'finalDownload' : 'storePending')
