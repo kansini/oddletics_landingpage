@@ -23,6 +23,12 @@ html {
   scroll-padding-top: 120px;
 }
 
+iframe {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -3383,8 +3389,13 @@ h2 {
     }
 
     .harmony-copy-zh {
-      .harmony-title { font-size: 21px; }
-      .harmony-subtitle { font-size: 14px; }
+      .harmony-title {
+        font-size: 21px;
+      }
+
+      .harmony-subtitle {
+        font-size: 14px;
+      }
     }
   }
   .final-store-buttons {
@@ -3585,13 +3596,21 @@ h2 {
 }
 
 @media (max-width: 800px) {
-  html { scroll-padding-top: 100px; }
-  .site-shell { padding-top: 84px; }
+  html {
+    scroll-padding-top: 100px;
+  }
+  .site-shell {
+    padding-top: 84px;
+  }
 }
 
 @media (max-width: 600px) {
-  html { scroll-padding-top: 96px; }
-  .site-shell { padding-top: 80px; }
+  html {
+    scroll-padding-top: 96px;
+  }
+  .site-shell {
+    padding-top: 80px;
+  }
 }
 
 /* Keep the ink outlines readable on the illustrated group scene in both themes. */
