@@ -7,7 +7,7 @@ export const zh = {
     navAbout: '这是什么',
     navEvents: '怪趣项目',
     navPlay: '涂鸦体验',
-    navDownload: '下载 App',
+    navDownload: '获取 App',
     menu: '菜单',
     close: '关闭',
     openMenu: '打开导航',

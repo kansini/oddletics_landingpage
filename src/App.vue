@@ -9,12 +9,15 @@ import HowItWorks from './components/HowItWorks.vue'
 import DownloadBadge from './components/DownloadBadge.vue'
 import {useSitePreferences} from './composables/preferences'
 import SportsPlayground from './components/SportsPlayground.vue'
+import ThemeStadiumTransition from './components/ThemeStadiumTransition.vue'
 import {downloadUrls, type DownloadPlatform} from './data/downloads'
 import type {MessageKey} from './data/messages'
 
 gsap.registerPlugin(ScrollTrigger)
 const {locale, theme, t, toggleTheme} = useSitePreferences()
 const root = ref<HTMLElement>()
+const themeTransition = ref<InstanceType<typeof ThemeStadiumTransition>>()
+const themeSwitching = ref(false)
 const mobileMenu = ref(false)
 const openFaq = ref<number | null>(0)
 const isScrolled = ref(false)
@@ -27,6 +30,25 @@ const faqs: { q: MessageKey; a: MessageKey }[] = [
 ]
 let media: gsap.MatchMedia | undefined
 let context: gsap.Context | undefined
+
+async function switchStadiumTheme() {
+  if (themeSwitching.value) return
+  if (!themeTransition.value) { toggleTheme(); return }
+  // Spotlight the largest visible scene, including when switching halfway down the page.
+  const width = window.innerWidth, height = window.innerHeight
+  let focus = {x: width / 2, y: height / 2}
+  let largestArea = 0
+  root.value?.querySelectorAll<HTMLElement>('.hero-art, .event-stage, .demo-workspace, .friends-illustration, .faq-list, .final-store-buttons').forEach(element => {
+    const rect = element.getBoundingClientRect()
+    const left = Math.max(0, rect.left), right = Math.min(width, rect.right)
+    const top = Math.max(80, rect.top), bottom = Math.min(height, rect.bottom)
+    const area = Math.max(0, right - left) * Math.max(0, bottom - top)
+    if (area > largestArea) { largestArea = area; focus = {x: (left + right) / 2, y: (top + bottom) / 2} }
+  })
+  themeSwitching.value = true
+  try { await themeTransition.value.play(toggleTheme, theme.value === 'light', focus) }
+  finally { themeSwitching.value = false }
+}
 
 function closeMenu() {
   mobileMenu.value = false
@@ -50,7 +72,7 @@ function restoreFocus() {
   dialogTrigger.value?.focus()
 }
 
-watch(locale, async () => {
+watch([locale, openFaq], async () => {
   await nextTick();
   ScrollTrigger.refresh()
 })
@@ -181,6 +203,56 @@ onMounted(() => {
           scale: () => 1 + layer.scale * friendsStrength() / 2
         }, 0)
       })
+      const sectionStrength = () => window.innerWidth <= 600 ? 0.45 : 1
+      type SectionLayer = {name: string; y: number; mobileY?: number; x?: number; rotation?: number}
+      function addSectionParallax(trigger: string, sectionLayers: SectionLayer[], end = 'bottom 12%') {
+        const timeline = gsap.timeline({
+          defaults: {duration: 1, ease: 'none', transformOrigin: '50% 50%'},
+          scrollTrigger: {
+            trigger,
+            start: 'top 88%',
+            end,
+            scrub: 0.65,
+            invalidateOnRefresh: true
+          }
+        })
+        sectionLayers.forEach(layer => {
+          const travelY = () => (window.innerWidth <= 600 ? layer.mobileY ?? layer.y : layer.y) * sectionStrength()
+          timeline.fromTo(`[data-section-layer="${layer.name}"]`, {
+            x: () => -(layer.x ?? 0) * sectionStrength() / 2,
+            y: () => -travelY() / 2,
+            rotation: () => -(layer.rotation ?? 0) * sectionStrength() / 2
+          }, {
+            x: () => (layer.x ?? 0) * sectionStrength() / 2,
+            y: () => travelY() / 2,
+            rotation: () => (layer.rotation ?? 0) * sectionStrength() / 2
+          }, 0)
+        })
+      }
+      // Inner layers compose with reveal animations and preserve the drawing board's hit area.
+      addSectionParallax('#play', [
+        {name: 'play-index', y: -24},
+        {name: 'play-title', y: -58},
+        {name: 'play-copy', y: -18},
+        {name: 'play-star', x: 24, y: -110, rotation: 65},
+        {name: 'play-arrow', x: 14, y: -38, rotation: -18},
+        {name: 'play-board', y: 36},
+      ])
+      addSectionParallax('.faq-section', [
+        {name: 'faq-index', y: -20},
+        {name: 'faq-title', y: -46},
+        {name: 'faq-copy', y: -18},
+        {name: 'faq-mark', x: 18, y: -100, rotation: -16},
+        {name: 'faq-list', y: 32},
+      ])
+      // Clamp the last section to the page end so its full motion remains reachable.
+      addSectionParallax('#download', [
+        {name: 'download-index', y: -62},
+        {name: 'download-title', y: -36},
+        {name: 'download-copy', y: -18},
+        {name: 'download-left', x: 32, y: -120, mobileY: -65, rotation: 18},
+        {name: 'download-right', x: -36, y: -170, mobileY: -100, rotation: -22},
+      ], 'clamp(bottom 25%)')
       gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(element => {
         gsap.from(element, {
           opacity: 0,
@@ -224,16 +296,19 @@ onBeforeUnmount(() => {
           </div>
           <button class="theme-toggle" :aria-label="t(theme === 'light' ? 'switchDark' : 'switchLight')"
                   :title="t(theme === 'light' ? 'switchDark' : 'switchLight')" :aria-pressed="theme === 'dark'"
-                  @click="toggleTheme">
-            <svg v-if="theme === 'light'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M21 13A9 9 0 0 1 11 3 9 9 0 1 0 21 13Z"/>
-            </svg>
-            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                 aria-hidden="true">
-              <circle cx="12" cy="12" r="4"/>
-              <path d="M12 2V4M12 20V22M2 12H4M20 12H22M5 5L6.5 6.5M17.5 17.5L19 19M5 19L6.5 17.5M17.5 6.5L19 5"/>
-            </svg>
+                  :aria-busy="themeSwitching" :aria-disabled="themeSwitching || undefined"
+                  @click="switchStadiumTheme">
+            <span class="theme-icon" :class="{ 'is-switching': themeSwitching }">
+              <svg v-if="theme === 'light'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 13A9 9 0 0 1 11 3 9 9 0 1 0 21 13Z"/>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                   aria-hidden="true">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2V4M12 20V22M2 12H4M20 12H22M5 5L6.5 6.5M17.5 17.5L19 19M5 19L6.5 17.5M17.5 6.5L19 5"/>
+              </svg>
+            </span>
           </button>
           <a class="button button-dark nav-cta" href="#download">{{ t('navDownload') }}</a>
           <button class="menu-toggle" :aria-expanded="mobileMenu" aria-controls="mobile-navigation"
@@ -282,16 +357,16 @@ onBeforeUnmount(() => {
       <HowItWorks/>
       <SportsPlayground/>
       <section id="play" class="play-section section-space wrap" aria-labelledby="play-title">
-        <div class="play-intro" data-reveal><p class="eyebrow section-index">03 / YOUR TURN TO BE ODD</p><span
-            class="little-star" aria-hidden="true">✳</span>
-          <h2 id="play-title">{{ t('playTitle1') }}<br/>{{ t('playTitle2') }}<span
+        <div class="play-intro" data-reveal><p class="eyebrow section-index" data-section-layer="play-index">03 / YOUR TURN TO BE ODD</p><span
+            class="little-star" aria-hidden="true"><span data-section-layer="play-star">✳</span></span>
+          <h2 id="play-title" data-section-layer="play-title">{{ t('playTitle1') }}<br/>{{ t('playTitle2') }}<span
               class="handwritten-underline">{{ t('playTitleAccent') }}</span>{{ t('playTitle3') }}</h2>
-          <p class="multiline">{{ t('playIntro') }}</p>
-          <div class="play-aside"><span>↪</span>
+          <p class="multiline" data-section-layer="play-copy">{{ t('playIntro') }}</p>
+          <div class="play-aside"><span data-section-layer="play-arrow">↪</span>
             <p>{{ t('playAside') }}<br/><strong>{{ t('playAsideBold') }}</strong></p></div>
         </div>
         <div class="demo-container" data-reveal>
-          <DrawingDemo/>
+          <div data-section-layer="play-board"><DrawingDemo/></div>
         </div>
       </section>
       <section class="friends-section wrap">
@@ -309,10 +384,17 @@ onBeforeUnmount(() => {
             <span>↗</span></a></div>
       </section>
       <section class="faq-section section-space wrap" aria-labelledby="faq-title">
-        <div data-reveal><p class="eyebrow section-index">04 / A FEW LITTLE QUESTIONS</p>
-          <h2 id="faq-title">{{ t('faqTitle') }}</h2>
-          <p class="faq-aside">{{ t('faqAside') }}</p></div>
+        <div class="faq-intro" data-reveal><p class="eyebrow section-index" data-section-layer="faq-index">04 / A FEW LITTLE QUESTIONS</p>
+          <h2 id="faq-title" data-section-layer="faq-title">{{ t('faqTitle') }}</h2>
+          <p class="faq-aside" data-section-layer="faq-copy">{{ t('faqAside') }}</p>
+          <div class="faq-mark" aria-hidden="true"><svg data-section-layer="faq-mark" viewBox="0 0 140 160" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M28 48C25 18 48 8 73 13 107 17 117 50 96 70L74 89Q63 98 68 117" stroke-width="3"/>
+            <path d="M38 43C38 25 54 21 67 23M105 91L115 85M113 106L127 106M99 118L109 125" stroke-width="1.6"/>
+            <ellipse cx="69" cy="139" rx="6" ry="6.5" stroke-width="2.5"/>
+          </svg></div>
+        </div>
         <div class="faq-list" data-reveal>
+          <div data-section-layer="faq-list">
           <article v-for="(faq, index) in faqs" :key="faq.q" class="faq-item" :class="{ expanded: openFaq === index }">
             <h3>
               <button :id="`faq-button-${index}`" :aria-expanded="openFaq === index"
@@ -322,17 +404,18 @@ onBeforeUnmount(() => {
             <div v-show="openFaq === index" :id="`faq-answer-${index}`" role="region"
                  :aria-labelledby="`faq-button-${index}`"><p>{{ t(faq.a) }}</p></div>
           </article>
+          </div>
         </div>
       </section>
       <section id="download" class="final-section">
         <div class="wrap final-inner" data-reveal>
-          <DoodleAthlete class="final-doodle left-doodle" kind="frog" color="#27b77c"/>
-          <DoodleAthlete class="final-doodle right-doodle" kind="dog" color="#faf8ef"/>
-          <p class="eyebrow">THE WORLD NEEDS YOUR KIND OF ODD.</p>
-          <h2>{{ t('finalTitle1') }}<br/>{{ t('finalTitle2') }}<span>{{
+          <div class="final-doodle left-doodle" aria-hidden="true"><div class="final-doodle-depth" data-section-layer="download-left"><DoodleAthlete kind="frog" color="#27b77c"/></div></div>
+          <div class="final-doodle right-doodle" aria-hidden="true"><div class="final-doodle-depth" data-section-layer="download-right"><DoodleAthlete kind="dog" color="#faf8ef"/></div></div>
+          <p class="eyebrow" data-section-layer="download-index">THE WORLD NEEDS YOUR KIND OF ODD.</p>
+          <h2 data-section-layer="download-title">{{ t('finalTitle1') }}<br/>{{ t('finalTitle2') }}<span>{{
               t('finalTitleAccent')
             }}</span>{{ t('finalTitle3') }}</h2>
-          <p class="final-description">{{ t('finalText') }}</p>
+          <p class="final-description" data-section-layer="download-copy">{{ t('finalText') }}</p>
           <div class="final-store-buttons">
             <DownloadBadge platform="ios" @unavailable="showDownload"/>
             <DownloadBadge platform="harmony" @unavailable="showDownload"/>
@@ -369,5 +452,6 @@ onBeforeUnmount(() => {
           t('downloadText', {platform: t(pendingPlatform === 'ios' ? 'appStore' : 'harmonyStore')})
         }}</p><a class="button button-green" href="#play" @click="closeDownload">{{ t('goStudio') }} <span>↗</span></a>
     </dialog>
+    <ThemeStadiumTransition ref="themeTransition"/>
   </div>
 </template>
