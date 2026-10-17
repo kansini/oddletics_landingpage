@@ -10,8 +10,7 @@ import DownloadBadge from './components/DownloadBadge.vue'
 import {useSitePreferences} from './composables/preferences'
 import SportsPlayground from './components/SportsPlayground.vue'
 import ThemeStadiumTransition from './components/ThemeStadiumTransition.vue'
-import {downloadUrls, type DownloadPlatform} from './data/downloads'
-import {getDownloadPlatforms} from './data/download-platforms'
+import {downloadUrls, getDownloadPlatforms, type DownloadPlatform} from './data/downloads'
 import type {MessageKey} from './data/messages'
 
 gsap.registerPlugin(ScrollTrigger)
