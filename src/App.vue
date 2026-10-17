@@ -94,6 +94,38 @@ onMounted(() => {
         ease: 'power3.out',
         clearProps: 'opacity,transform'
       })
+      // Separate SVG wrappers preserve the entrance, original rotations and athlete bounces.
+      const depthStrength = () => window.innerWidth <= 600 ? 0.65 : 1
+      const layers = [
+        {name: 'backdrop', x: -15, y: 130, rotation: -2, scale: 1.04},
+        {name: 'infield', x: 5, y: 75, rotation: 1, scale: 1.02},
+        {name: 'pool', x: -55, y: 45, rotation: -7, scale: 1},
+        {name: 'target', x: 45, y: -70, rotation: 10, scale: 1.04},
+        {name: 'track', x: 18, y: -45, rotation: 2, scale: 1},
+        {name: 'athletes', x: 36, y: -30, rotation: -1, scale: 1},
+        {name: 'sign', x: -32, y: -65, rotation: -5, scale: 1},
+        {name: 'live', x: -35, y: -120, rotation: -12, scale: 1.06},
+        {name: 'badge', x: 55, y: -150, rotation: 14, scale: 1.1},
+        {name: 'doodles', x: 12, y: -95, rotation: -3, scale: 1},
+      ]
+      const heroParallax = gsap.timeline({
+        defaults: {ease: 'none', transformOrigin: '50% 50%'},
+        scrollTrigger: {
+          trigger: '.hero-art',
+          start: 'clamp(top bottom)',
+          end: 'center top',
+          scrub: 0.65,
+          invalidateOnRefresh: true
+        }
+      })
+      layers.forEach(layer => {
+        heroParallax.to(`[data-hero-layer="${layer.name}"]`, {
+          x: () => layer.x * depthStrength(),
+          y: () => layer.y * depthStrength(),
+          rotation: () => layer.rotation * depthStrength(),
+          scale: () => 1 + (layer.scale - 1) * depthStrength()
+        }, 0)
+      })
       gsap.to('.runner-one', {
         y: -9,
         rotation: -2,
@@ -120,6 +152,18 @@ onMounted(() => {
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut'
+      })
+      // Scroll parallax belongs to a wrapper so it can compose with the marquee loop.
+      gsap.fromTo('.ticker-scroll', {x: 0}, {
+        x: () => -Math.min(window.innerWidth * 0.25, 300),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.ticker',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 0.8,
+          invalidateOnRefresh: true
+        }
       })
       gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(element => {
         gsap.from(element, {
@@ -213,9 +257,11 @@ onBeforeUnmount(() => {
         </section>
       </div>
       <div class="ticker" :aria-label="t('tickerLabel')">
-        <div class="ticker-track"><span v-for="i in 4" :key="i" :aria-hidden="i > 1 ? true : undefined">{{
-            t('tickerOne')
-          }} <b>✳</b> {{ t('tickerTwo') }} <b>✳</b> STAY ODD. PLAY ON. <b>✳</b></span></div>
+        <div class="ticker-scroll">
+          <div class="ticker-track"><span v-for="i in 12" :key="i" :aria-hidden="i > 1 ? true : undefined">{{
+              t('tickerOne')
+            }} <b>✳</b> {{ t('tickerTwo') }} <b>✳</b> STAY ODD. PLAY ON. <b>✳</b></span></div>
+        </div>
       </div>
       <section id="how" class="how-section section-space wrap" aria-labelledby="how-title">
         <div class="section-heading" data-reveal>
