@@ -148,6 +148,39 @@ onMounted(() => {
           invalidateOnRefresh: true
         }
       })
+      const friendsStrength = () => window.innerWidth <= 600 ? 0.55 : 1
+      const friendsParallax = gsap.timeline({
+        defaults: {duration: 1, ease: 'none', transformOrigin: '50% 50%'},
+        scrollTrigger: {
+          trigger: '.friends-illustration',
+          start: 'top 90%',
+          end: 'bottom 15%',
+          scrub: 0.65,
+          invalidateOnRefresh: true
+        }
+      })
+      // Animate positioning wrappers so each character keeps its drawn-in tilt.
+      const friendsLayers = [
+        {name: 'backdrop', x: 0, y: 45, rotation: 4, scale: 0.06},
+        {name: 'frog', x: -24, y: -75, rotation: -10, scale: 0},
+        {name: 'dog', x: 26, y: -35, rotation: 8, scale: 0},
+        {name: 'star', x: -28, y: -115, rotation: -14, scale: 0},
+        {name: 'blob', x: 30, y: -80, rotation: 12, scale: 0},
+        {name: 'bubble', x: 14, y: -125, rotation: 6, scale: 0},
+      ]
+      friendsLayers.forEach(layer => {
+        friendsParallax.fromTo(`[data-friend-layer="${layer.name}"]`, {
+          x: () => -layer.x * friendsStrength() / 2,
+          y: () => -layer.y * friendsStrength() / 2,
+          rotation: () => -layer.rotation * friendsStrength() / 2,
+          scale: () => 1 - layer.scale * friendsStrength() / 2
+        }, {
+          x: () => layer.x * friendsStrength() / 2,
+          y: () => layer.y * friendsStrength() / 2,
+          rotation: () => layer.rotation * friendsStrength() / 2,
+          scale: () => 1 + layer.scale * friendsStrength() / 2
+        }, 0)
+      })
       gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(element => {
         gsap.from(element, {
           opacity: 0,
@@ -228,7 +261,7 @@ onBeforeUnmount(() => {
             <p class="hero-description multiline">{{ t('heroDescription') }}</p>
             <div class="hero-actions">
               <DownloadBadge platform="ios" @unavailable="showDownload"/>
-              <a class="hero-secondary" href="#play"><span class="play-icon">↗</span>{{ t('navPlay') }}</a></div>
+              <a class="hero-secondary" href="#play"><span class="play-icon" aria-hidden="true">↗</span><span class="hero-secondary-label">{{ t('navPlay') }}</span></a></div>
             <div class="hero-footnote"><span class="tiny-doodles"><DoodleAthlete kind="frog" color="#27b77c"/><DoodleAthlete
                 kind="dog"/><DoodleAthlete kind="blob" color="#bdc6f1"/></span><span>{{
                 t('heroFootnote')
@@ -261,14 +294,16 @@ onBeforeUnmount(() => {
           <DrawingDemo/>
         </div>
       </section>
-      <section class="friends-section wrap" data-reveal>
+      <section class="friends-section wrap">
         <div class="friends-illustration">
-          <DoodleAthlete kind="frog" color="#27b77c"/>
-          <DoodleAthlete kind="dog"/>
-          <DoodleAthlete kind="star" color="#ffd166"/>
-          <DoodleAthlete kind="blob" color="#c1c8eb"/>
-          <span class="friends-bubble">{{ t('friendsBubble') }}</span></div>
-        <div><p class="eyebrow section-index">BETTER WHEN WE’RE ODD TOGETHER</p>
+          <div class="friend-layer" data-friend-layer="frog"><DoodleAthlete kind="frog" color="#27b77c"/></div>
+          <div class="friend-layer" data-friend-layer="dog"><DoodleAthlete kind="dog"/></div>
+          <div class="friend-layer" data-friend-layer="star"><DoodleAthlete kind="star" color="#ffd166"/></div>
+          <div class="friend-layer" data-friend-layer="blob"><DoodleAthlete kind="blob" color="#c1c8eb"/></div>
+          <div class="friends-bubble-layer" data-friend-layer="bubble"><span class="friends-bubble">{{ t('friendsBubble') }}</span></div>
+          <div class="friends-backdrop" data-friend-layer="backdrop" aria-hidden="true"></div>
+        </div>
+        <div data-reveal><p class="eyebrow section-index">BETTER WHEN WE’RE ODD TOGETHER</p>
           <h2 class="multiline">{{ t('friendsTitle') }}</h2>
           <p class="multiline">{{ t('friendsText') }}</p><a href="#play" class="text-link">{{ t('friendsCta') }}
             <span>↗</span></a></div>
@@ -310,7 +345,16 @@ onBeforeUnmount(() => {
     <div class="footer-background"><footer class="site-footer wrap"><a class="brand footer-brand" href="#"><span class="brand-name">{{
         t('brand')
       }}<span>ODDLETICS</span></span></a>
-      <p>{{ t('footerTag') }}</p><span class="micro">© {{ new Date().getFullYear() }} ODDLETICS</span><a href="#"
+      <p>{{ t('footerTag') }}</p>
+      <a class="footer-contact" href="mailto:ssflood7d@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="14" rx="3"/>
+          <path d="m4 7 6.7 5a2.2 2.2 0 0 0 2.6 0L20 7"/>
+        </svg>
+        <span>{{ t('contactUs') }}</span>
+        <strong>ssflood7d@gmail.com</strong>
+      </a>
+      <span class="micro">© {{ new Date().getFullYear() }} ODDLETICS</span><a href="#"
                                                                                                          class="back-top"
                                                                                                          :aria-label="t('backTop')">{{
           t('backTop')

@@ -316,9 +316,24 @@ h1 {
   gap: 9px;
   font-size: 12px;
 
-  &:hover {
-    text-decoration: underline;
-    text-underline-offset: 6px;
+  .hero-secondary-label {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      height: 2px;
+      left: 0;
+      right: 100%;
+      bottom: -6px;
+      background: currentColor;
+      transition: right .2s;
+    }
+  }
+
+  &:hover .hero-secondary-label::after,
+  &:focus-visible .hero-secondary-label::after {
+    right: 0;
   }
 }
 
@@ -1247,10 +1262,9 @@ h2 {
 .friends-illustration {
   position: relative;
   height: 255px;
-  background: #ebeedf;
-  border-radius: 50%;
+  isolation: isolate;
 
-  > svg {
+  > .friend-layer {
     position: absolute;
     width: 180px;
     height: 165px;
@@ -1258,34 +1272,56 @@ h2 {
     &:nth-child(1) {
       left: 1%;
       top: 5px;
-      transform: rotate(-12deg);
+      > svg { transform: rotate(-12deg); }
     }
 
     &:nth-child(2) {
       right: 0;
       top: 4px;
-      transform: rotate(8deg);
+      > svg { transform: rotate(8deg); }
     }
 
     &:nth-child(3) {
       width: 155px;
       bottom: -9px;
       left: 15%;
-      transform: rotate(-10deg);
+      > svg { transform: rotate(-10deg); }
     }
 
     &:nth-child(4) {
       right: 7%;
       bottom: -7px;
-      transform: rotate(10deg);
+      > svg { transform: rotate(10deg); }
     }
   }
 }
 
-.friends-bubble {
+.friend-layer {
+  z-index: 1;
+
+  > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.friends-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 50%;
+}
+
+.friends-bubble-layer {
   position: absolute;
   top: 20px;
   left: 30%;
+  z-index: 2;
+}
+
+.friends-bubble {
+  display: block;
   background: $paper;
   padding: 10px 13px;
   border: 1px solid $ink;
@@ -1485,6 +1521,41 @@ h2 {
   }
 }
 
+.footer-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background-color .2s ease, border-color .2s ease;
+
+  > svg {
+    width: 19px;
+    height: 19px;
+    flex-shrink: 0;
+  }
+
+  > span {
+    font-size: 10px;
+    color: var(--hero-note);
+  }
+
+  strong {
+    font-size: 12px;
+    font-weight: 500;
+    text-underline-offset: 4px;
+  }
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--ink) 5%, transparent);
+    border-color: currentColor;
+
+    strong { text-decoration: underline; }
+  }
+}
+
 .back-top {
   font-size: 10px;
   margin-left: 38px;
@@ -1637,7 +1708,7 @@ h2 {
   .friends-section {
     gap: 50px;
   }
-  .friends-illustration > svg {
+  .friends-illustration > .friend-layer {
     width: 160px;
     height: 150px;
 
@@ -1901,7 +1972,7 @@ h2 {
   .friends-illustration {
     height: 235px;
 
-    > svg {
+    > .friend-layer {
       width: 142px;
 
       &:nth-child(3) {
@@ -1914,10 +1985,12 @@ h2 {
       }
     }
   }
-  .friends-bubble {
-    font-size: 9px;
+  .friends-bubble-layer {
     left: 22%;
     top: 17px;
+  }
+  .friends-bubble {
+    font-size: 9px;
   }
   .faq-section {
     gap: 30px;
@@ -2340,7 +2413,7 @@ h2 {
     height: 242px;
     margin: auto;
 
-    > svg {
+    > .friend-layer {
       width: 163px;
       height: 150px;
 
@@ -2364,8 +2437,10 @@ h2 {
       }
     }
   }
-  .friends-bubble {
+  .friends-bubble-layer {
     left: 29%;
+  }
+  .friends-bubble {
     font-size: 10px;
   }
   .faq-section {
@@ -2456,6 +2531,12 @@ h2 {
   }
   .footer-brand .brand-name {
     font-size: 22px;
+  }
+  .footer-contact {
+    grid-column: 1 / -1;
+    justify-self: start;
+    gap: 9px;
+    padding: 12px 14px;
   }
   .back-top {
     justify-self: end;
@@ -2766,10 +2847,6 @@ h2 {
 .you-tag {
   color: #292e23;
   border-color: #292e23;
-}
-
-.friends-illustration {
-  background: var(--surface-alt);
 }
 
 .friends-bubble {
@@ -3620,6 +3697,6 @@ h2 {
 }
 
 /* Keep the ink outlines readable on the illustrated group scene in both themes. */
-.friends-illustration {
+.friends-backdrop {
   background: #edead6;
 }
