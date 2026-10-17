@@ -3573,8 +3573,8 @@ h2 {
 
 .header-background.is-scrolled {
   background-color: color-mix(in srgb, var(--hero) 82%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.12);
-  backdrop-filter: blur(14px) saturate(1.12);
+  -webkit-backdrop-filter: blur(8px) saturate(1.12);
+  backdrop-filter: blur(8px) saturate(1.12);
 }
 
 .site-shell {
