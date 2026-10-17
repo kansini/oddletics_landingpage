@@ -27,7 +27,7 @@ VITE_HARMONY_STORE_URL=https://url.cloud.huawei.com/CvXmvSdAXe
 
 环境变量只接受 HTTPS 链接，在构建时读取；更新后请重启开发服务器或重新构建。
 
-首屏和底部下载区根据浏览器的系统信息统一显示入口：iOS、iPadOS 和 macOS 显示 App Store；明确标识为 HarmonyOS / OpenHarmony 的设备显示鸿蒙应用市场；Windows、Android 及无法识别的系统显示两个按钮。仅有华为品牌或 ArkWeb 内核标识时，不将设备直接判定为鸿蒙。
+仅首屏 Hero 根据浏览器的系统信息显示下载入口：iOS、iPadOS 和 macOS 显示 App Store；明确标识为 HarmonyOS / OpenHarmony 的设备显示鸿蒙应用市场；Windows、Android 及无法识别的系统显示两个按钮。仅有华为品牌或 ArkWeb 内核标识时，不将设备直接判定为鸿蒙。底部下载区始终保留 App Store 和鸿蒙应用市场两个按钮。
 
 ## 页面内容
 

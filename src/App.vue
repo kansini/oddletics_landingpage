@@ -34,7 +34,10 @@ let context: gsap.Context | undefined
 
 async function switchStadiumTheme() {
   if (themeSwitching.value) return
-  if (!themeTransition.value) { toggleTheme(); return }
+  if (!themeTransition.value) {
+    toggleTheme();
+    return
+  }
   // Spotlight the largest visible scene, including when switching halfway down the page.
   const width = window.innerWidth, height = window.innerHeight
   let focus = {x: width / 2, y: height / 2}
@@ -44,11 +47,17 @@ async function switchStadiumTheme() {
     const left = Math.max(0, rect.left), right = Math.min(width, rect.right)
     const top = Math.max(80, rect.top), bottom = Math.min(height, rect.bottom)
     const area = Math.max(0, right - left) * Math.max(0, bottom - top)
-    if (area > largestArea) { largestArea = area; focus = {x: (left + right) / 2, y: (top + bottom) / 2} }
+    if (area > largestArea) {
+      largestArea = area;
+      focus = {x: (left + right) / 2, y: (top + bottom) / 2}
+    }
   })
   themeSwitching.value = true
-  try { await themeTransition.value.play(toggleTheme, theme.value === 'light', focus) }
-  finally { themeSwitching.value = false }
+  try {
+    await themeTransition.value.play(toggleTheme, theme.value === 'light', focus)
+  } finally {
+    themeSwitching.value = false
+  }
 }
 
 function closeMenu() {
@@ -205,7 +214,8 @@ onMounted(() => {
         }, 0)
       })
       const sectionStrength = () => window.innerWidth <= 600 ? 0.45 : 1
-      type SectionLayer = {name: string; y: number; mobileY?: number; x?: number; rotation?: number}
+      type SectionLayer = { name: string; y: number; mobileY?: number; x?: number; rotation?: number }
+
       function addSectionParallax(trigger: string, sectionLayers: SectionLayer[], end = 'bottom 12%') {
         const timeline = gsap.timeline({
           defaults: {duration: 1, ease: 'none', transformOrigin: '50% 50%'},
@@ -230,6 +240,7 @@ onMounted(() => {
           }, 0)
         })
       }
+
       // Inner layers compose with reveal animations and preserve the drawing board's hit area.
       addSectionParallax('#play', [
         {name: 'play-index', y: -24},
@@ -304,7 +315,8 @@ onBeforeUnmount(() => {
                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M21 13A9 9 0 0 1 11 3 9 9 0 1 0 21 13Z"/>
               </svg>
-              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                   stroke-linecap="round"
                    aria-hidden="true">
                 <circle cx="12" cy="12" r="4"/>
                 <path d="M12 2V4M12 20V22M2 12H4M20 12H22M5 5L6.5 6.5M17.5 17.5L19 19M5 19L6.5 17.5M17.5 6.5L19 5"/>
@@ -337,9 +349,11 @@ onBeforeUnmount(() => {
             <p class="hero-description multiline">{{ t('heroDescription') }}</p>
             <div class="hero-actions">
               <div class="hero-store-buttons" :class="{'has-multiple': visibleDownloadPlatforms.length > 1}">
-                <DownloadBadge v-for="platform in visibleDownloadPlatforms" :key="platform" :platform="platform" @unavailable="showDownload"/>
+                <DownloadBadge v-for="platform in visibleDownloadPlatforms" :key="platform" :platform="platform"
+                               @unavailable="showDownload"/>
               </div>
-              <a class="hero-secondary" href="#play"><span class="play-icon" aria-hidden="true">↗</span><span class="hero-secondary-label">{{ t('navPlay') }}</span></a></div>
+              <a class="hero-secondary" href="#play"><span class="play-icon" aria-hidden="true">↗</span><span
+                  class="hero-secondary-label">{{ t('navPlay') }}</span></a></div>
             <div class="hero-footnote"><span class="tiny-doodles"><DoodleAthlete kind="frog" color="#27b77c"/><DoodleAthlete
                 kind="dog"/><DoodleAthlete kind="blob" color="#bdc6f1"/></span><span>{{
                 t('heroFootnote')
@@ -360,7 +374,8 @@ onBeforeUnmount(() => {
       <HowItWorks/>
       <SportsPlayground/>
       <section id="play" class="play-section section-space wrap" aria-labelledby="play-title">
-        <div class="play-intro" data-reveal><p class="eyebrow section-index" data-section-layer="play-index">03 / YOUR TURN TO BE ODD</p><span
+        <div class="play-intro" data-reveal><p class="eyebrow section-index" data-section-layer="play-index">03 / YOUR
+          TURN TO BE ODD</p><span
             class="little-star" aria-hidden="true"><span data-section-layer="play-star">✳</span></span>
           <h2 id="play-title" data-section-layer="play-title">{{ t('playTitle1') }}<br/>{{ t('playTitle2') }}<span
               class="handwritten-underline">{{ t('playTitleAccent') }}</span>{{ t('playTitle3') }}</h2>
@@ -369,16 +384,27 @@ onBeforeUnmount(() => {
             <p>{{ t('playAside') }}<br/><strong>{{ t('playAsideBold') }}</strong></p></div>
         </div>
         <div class="demo-container" data-reveal>
-          <div data-section-layer="play-board"><DrawingDemo/></div>
+          <div data-section-layer="play-board">
+            <DrawingDemo/>
+          </div>
         </div>
       </section>
       <section class="friends-section wrap">
         <div class="friends-illustration">
-          <div class="friend-layer" data-friend-layer="frog"><DoodleAthlete kind="frog" color="#27b77c"/></div>
-          <div class="friend-layer" data-friend-layer="dog"><DoodleAthlete kind="dog"/></div>
-          <div class="friend-layer" data-friend-layer="star"><DoodleAthlete kind="star" color="#ffd166"/></div>
-          <div class="friend-layer" data-friend-layer="blob"><DoodleAthlete kind="blob" color="#c1c8eb"/></div>
-          <div class="friends-bubble-layer" data-friend-layer="bubble"><span class="friends-bubble">{{ t('friendsBubble') }}</span></div>
+          <div class="friend-layer" data-friend-layer="frog">
+            <DoodleAthlete kind="frog" color="#27b77c"/>
+          </div>
+          <div class="friend-layer" data-friend-layer="dog">
+            <DoodleAthlete kind="dog"/>
+          </div>
+          <div class="friend-layer" data-friend-layer="star">
+            <DoodleAthlete kind="star" color="#ffd166"/>
+          </div>
+          <div class="friend-layer" data-friend-layer="blob">
+            <DoodleAthlete kind="blob" color="#c1c8eb"/>
+          </div>
+          <div class="friends-bubble-layer" data-friend-layer="bubble"><span
+              class="friends-bubble">{{ t('friendsBubble') }}</span></div>
           <div class="friends-backdrop" data-friend-layer="backdrop" aria-hidden="true"></div>
         </div>
         <div data-reveal><p class="eyebrow section-index">BETTER WHEN WE’RE ODD TOGETHER</p>
@@ -387,63 +413,80 @@ onBeforeUnmount(() => {
             <span>↗</span></a></div>
       </section>
       <section class="faq-section section-space wrap" aria-labelledby="faq-title">
-        <div class="faq-intro" data-reveal><p class="eyebrow section-index" data-section-layer="faq-index">04 / A FEW LITTLE QUESTIONS</p>
+        <div class="faq-intro" data-reveal><p class="eyebrow section-index" data-section-layer="faq-index">04 / A FEW
+          LITTLE QUESTIONS</p>
           <h2 id="faq-title" data-section-layer="faq-title">{{ t('faqTitle') }}</h2>
           <p class="faq-aside" data-section-layer="faq-copy">{{ t('faqAside') }}</p>
-          <div class="faq-mark" aria-hidden="true"><svg data-section-layer="faq-mark" viewBox="0 0 140 160" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M28 48C25 18 48 8 73 13 107 17 117 50 96 70L74 89Q63 98 68 117" stroke-width="3"/>
-            <path d="M38 43C38 25 54 21 67 23M105 91L115 85M113 106L127 106M99 118L109 125" stroke-width="1.6"/>
-            <ellipse cx="69" cy="139" rx="6" ry="6.5" stroke-width="2.5"/>
-          </svg></div>
+          <div class="faq-mark" aria-hidden="true">
+            <svg data-section-layer="faq-mark" viewBox="0 0 140 160" fill="none" stroke="currentColor"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M28 48C25 18 48 8 73 13 107 17 117 50 96 70L74 89Q63 98 68 117" stroke-width="3"/>
+              <path d="M38 43C38 25 54 21 67 23M105 91L115 85M113 106L127 106M99 118L109 125" stroke-width="1.6"/>
+              <ellipse cx="69" cy="139" rx="6" ry="6.5" stroke-width="2.5"/>
+            </svg>
+          </div>
         </div>
         <div class="faq-list" data-reveal>
           <div data-section-layer="faq-list">
-          <article v-for="(faq, index) in faqs" :key="faq.q" class="faq-item" :class="{ expanded: openFaq === index }">
-            <h3>
-              <button :id="`faq-button-${index}`" :aria-expanded="openFaq === index"
-                      :aria-controls="`faq-answer-${index}`" @click="openFaq = openFaq === index ? null : index">
-                {{ t(faq.q) }}<span aria-hidden="true">{{ openFaq === index ? '−' : '+' }}</span></button>
-            </h3>
-            <div v-show="openFaq === index" :id="`faq-answer-${index}`" role="region"
-                 :aria-labelledby="`faq-button-${index}`"><p>{{ t(faq.a) }}</p></div>
-          </article>
+            <article v-for="(faq, index) in faqs" :key="faq.q" class="faq-item"
+                     :class="{ expanded: openFaq === index }">
+              <h3>
+                <button :id="`faq-button-${index}`" :aria-expanded="openFaq === index"
+                        :aria-controls="`faq-answer-${index}`" @click="openFaq = openFaq === index ? null : index">
+                  {{ t(faq.q) }}<span aria-hidden="true">{{ openFaq === index ? '−' : '+' }}</span></button>
+              </h3>
+              <div v-show="openFaq === index" :id="`faq-answer-${index}`" role="region"
+                   :aria-labelledby="`faq-button-${index}`"><p>{{ t(faq.a) }}</p></div>
+            </article>
           </div>
         </div>
       </section>
       <section id="download" class="final-section">
         <div class="wrap final-inner" data-reveal>
-          <div class="final-doodle left-doodle" aria-hidden="true"><div class="final-doodle-depth" data-section-layer="download-left"><DoodleAthlete kind="frog" color="#27b77c"/></div></div>
-          <div class="final-doodle right-doodle" aria-hidden="true"><div class="final-doodle-depth" data-section-layer="download-right"><DoodleAthlete kind="dog" color="#faf8ef"/></div></div>
+          <div class="final-doodle left-doodle" aria-hidden="true">
+            <div class="final-doodle-depth" data-section-layer="download-left">
+              <DoodleAthlete kind="frog" color="#27b77c"/>
+            </div>
+          </div>
+          <div class="final-doodle right-doodle" aria-hidden="true">
+            <div class="final-doodle-depth" data-section-layer="download-right">
+              <DoodleAthlete kind="dog" color="#faf8ef"/>
+            </div>
+          </div>
           <p class="eyebrow" data-section-layer="download-index">THE WORLD NEEDS YOUR KIND OF ODD.</p>
           <h2 data-section-layer="download-title">{{ t('finalTitle1') }}<br/>{{ t('finalTitle2') }}<span>{{
               t('finalTitleAccent')
             }}</span>{{ t('finalTitle3') }}</h2>
           <p class="final-description" data-section-layer="download-copy">{{ t('finalText') }}</p>
           <div class="final-store-buttons">
-            <DownloadBadge v-for="platform in visibleDownloadPlatforms" :key="platform" :platform="platform" @unavailable="showDownload"/>
+            <DownloadBadge platform="ios" @unavailable="showDownload"/>
+            <DownloadBadge platform="harmony" @unavailable="showDownload"/>
           </div>
           <p class="download-status">{{
               t(downloadUrls.ios || downloadUrls.harmony ? 'finalDownload' : 'storePending')
             }}</p><a class="final-play-link" href="#play">{{ t('finalCta') }} <span>↗</span></a></div>
       </section>
     </main>
-    <div class="footer-background"><footer class="site-footer wrap"><a class="brand footer-brand" href="#"><span class="brand-name">{{
-        t('brand')
-      }}<span>ODDLETICS</span></span></a>
-      <p>{{ t('footerTag') }}</p>
-      <a class="footer-contact" href="mailto:ssflood7d@gmail.com">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="5" width="18" height="14" rx="3"/>
-          <path d="m4 7 6.7 5a2.2 2.2 0 0 0 2.6 0L20 7"/>
-        </svg>
-        <span>{{ t('contactUs') }}</span>
-        <strong>ssflood7d@gmail.com</strong>
-      </a>
-      <span class="micro">© {{ new Date().getFullYear() }} ODDLETICS</span><a href="#"
-                                                                                                         class="back-top"
-                                                                                                         :aria-label="t('backTop')">{{
-          t('backTop')
-        }} <span>↑</span></a></footer></div>
+    <div class="footer-background">
+      <footer class="site-footer wrap"><a class="brand footer-brand" href="#"><span class="brand-name">{{
+          t('brand')
+        }}<span>ODDLETICS</span></span></a>
+        <p>{{ t('footerTag') }}</p>
+        <a class="footer-contact" href="mailto:flood_flink@163.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="14" rx="3"/>
+            <path d="m4 7 6.7 5a2.2 2.2 0 0 0 2.6 0L20 7"/>
+          </svg>
+          <span>{{ t('contactUs') }}</span>
+          <strong>flood_flink@163.com</strong>
+        </a>
+        <span class="micro">© {{ new Date().getFullYear() }} ODDLETICS</span><a href="#"
+                                                                                class="back-top"
+                                                                                :aria-label="t('backTop')">{{
+            t('backTop')
+          }} <span>↑</span></a></footer>
+    </div>
     <dialog ref="downloadDialog" class="download-dialog" aria-labelledby="download-title" @close="restoreFocus"
             @click="event => { if (event.target === downloadDialog) closeDownload() }">
       <button class="dialog-close" :aria-label="t('closeDialog')" @click="closeDownload">×</button>
