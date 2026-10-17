@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import gsap from 'gsap'
 import {ScrollTrigger} from 'gsap/ScrollTrigger'
 import HeroTrack from './components/HeroTrack.vue'
 import DoodleAthlete from './components/DoodleAthlete.vue'
 import DrawingDemo from './components/DrawingDemo.vue'
-import StepArtwork from './components/StepArtwork.vue'
+import HowItWorks from './components/HowItWorks.vue'
 import DownloadBadge from './components/DownloadBadge.vue'
 import {useSitePreferences} from './composables/preferences'
-import {useSports} from './data/sports'
+import SportsPlayground from './components/SportsPlayground.vue'
 import {downloadUrls, type DownloadPlatform} from './data/downloads'
 import type {MessageKey} from './data/messages'
 
@@ -16,19 +16,11 @@ gsap.registerPlugin(ScrollTrigger)
 const {locale, theme, t, toggleTheme} = useSitePreferences()
 const root = ref<HTMLElement>()
 const mobileMenu = ref(false)
-const selectedSport = ref(0)
 const openFaq = ref<number | null>(0)
 const isScrolled = ref(false)
 const downloadDialog = ref<HTMLDialogElement>()
 const dialogTrigger = ref<HTMLElement | null>(null)
 const pendingPlatform = ref<DownloadPlatform>('ios')
-const sports = useSports()
-const sport = computed(() => sports.value[selectedSport.value]!)
-const steps: { title: MessageKey; text: MessageKey }[] = [
-  {title: 'step1Title', text: 'step1Text'},
-  {title: 'step2Title', text: 'step2Text'},
-  {title: 'step3Title', text: 'step3Text'},
-]
 const faqs: { q: MessageKey; a: MessageKey }[] = [
   {q: 'faq1q', a: 'faq1a'}, {q: 'faq2q', a: 'faq2a'},
   {q: 'faq3q', a: 'faq3a'}, {q: 'faq4q', a: 'faq4a'},
@@ -42,15 +34,6 @@ function closeMenu() {
 
 function updateScrolledState() {
   isScrolled.value = window.scrollY > 24
-}
-
-function handleSportKeys(event: KeyboardEvent) {
-  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
-  event.preventDefault()
-  if (event.key === 'Home') selectedSport.value = 0
-  else if (event.key === 'End') selectedSport.value = sports.value.length - 1
-  else selectedSport.value = (selectedSport.value + (event.key === 'ArrowRight' ? 1 : -1) + sports.value.length) % sports.value.length
-  nextTick(() => document.getElementById(`sport-tab-${selectedSport.value}`)?.focus())
 }
 
 function showDownload(event: MouseEvent, platform: DownloadPlatform) {
@@ -263,70 +246,8 @@ onBeforeUnmount(() => {
             }} <b>✳</b> {{ t('tickerTwo') }} <b>✳</b> STAY ODD. PLAY ON. <b>✳</b></span></div>
         </div>
       </div>
-      <section id="how" class="how-section section-space wrap" aria-labelledby="how-title">
-        <div class="section-heading" data-reveal>
-          <div><p class="eyebrow section-index">01 / WHAT’S THE ODD?</p>
-            <h2 id="how-title">{{ t('howTitleFirst') }}<span class="serif-word">{{
-                t('howTitleAccent')
-              }}</span>{{ t('howTitleLast') }}</h2></div>
-          <p class="multiline">{{ t('howIntro') }}</p></div>
-        <div class="steps-grid">
-          <article v-for="(step, index) in steps" :key="step.title" class="step" data-reveal>
-            <StepArtwork :index="index"/>
-            <div class="step-label"><span>0{{ index + 1 }}</span>
-              <h3>{{ t(step.title) }}</h3></div>
-            <p class="multiline">{{ t(step.text) }}</p></article>
-        </div>
-      </section>
-      <section id="events" class="events-section section-space" aria-labelledby="events-title">
-        <div class="wrap">
-          <div class="section-heading" data-reveal>
-            <div><p class="eyebrow section-index">02 / PICK YOUR PLAYGROUND</p>
-              <h2 id="events-title">{{ t('eventsTitleFirst') }}<br class="mobile-break"/>{{
-                  t('eventsTitleMiddle')
-                }}<span class="circled-word">{{ t('eventsTitleAccent') }}<svg viewBox="0 0 230 70"
-                                                                              preserveAspectRatio="none"
-                                                                              aria-hidden="true"><ellipse cx="115"
-                                                                                                          cy="36"
-                                                                                                          rx="111"
-                                                                                                          ry="31"
-                                                                                                          fill="none"
-                                                                                                          stroke="currentColor"
-                                                                                                          stroke-width="2"
-                                                                                                          transform="rotate(-4 115 36)"/></svg></span>{{
-                  t('eventsTitleLast')
-                }}
-              </h2>
-            </div>
-            <p class="multiline">{{ t('eventsIntro') }}</p></div>
-          <div class="sports-tabs" role="tablist" :aria-label="t('chooseSport')" @keydown="handleSportKeys">
-            <button v-for="(event, index) in sports" :id="`sport-tab-${index}`" :key="event.file" role="tab"
-                    :aria-selected="selectedSport === index" aria-controls="sport-panel"
-                    :tabindex="selectedSport === index ? 0 : -1" :class="{ active: selectedSport === index }"
-                    @click="selectedSport = index">{{ event.title }}
-            </button>
-          </div>
-          <div id="sport-panel" class="sport-panel" role="tabpanel" :aria-labelledby="`sport-tab-${selectedSport}`"
-               tabindex="0">
-            <Transition name="sport-fade" mode="out-in">
-              <div :key="sport.file" class="sport-panel-inner">
-                <div class="sport-info"><span class="sport-tag">{{ sport.tag }} <span>↗</span></span>
-                  <p class="micro">{{ sport.en }}</p>
-                  <h3>{{ sport.line }}</h3>
-                  <p class="sport-description">{{ sport.text }}</p><a class="text-link" href="#play">{{ t('sportCta') }}
-                    <span>↗</span></a></div>
-                <div class="sport-visual" :class="`sport-${sport.file}`">
-                  <div class="sport-orbit"/>
-                  <div class="sport-orbit orbit-two"/>
-                  <span class="sport-visual-label">ODDLETICS<br/>{{ sport.note }}</span><img
-                    :src="`/sports/${sport.file}.svg`" :alt="t('sportArtAlt', { sport: sport.title })" width="512"
-                    height="512" loading="lazy"/><span class="sport-number">0{{ selectedSport + 1 }}</span><span
-                    class="sport-visual-note">{{ t('sportNote') }}</span></div>
-              </div>
-            </Transition>
-          </div>
-        </div>
-      </section>
+      <HowItWorks/>
+      <SportsPlayground/>
       <section id="play" class="play-section section-space wrap" aria-labelledby="play-title">
         <div class="play-intro" data-reveal><p class="eyebrow section-index">03 / YOUR TURN TO BE ODD</p><span
             class="little-star" aria-hidden="true">✳</span>
