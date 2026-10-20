@@ -498,6 +498,11 @@ onBeforeUnmount(() => {
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
                stroke-linejoin="round" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg>
         </a>
+        <a href="https://foggy-mirror.netlify.app/" target="_blank" rel="noopener noreferrer">
+          <span class="footer-project-name">{{ t('foggyMirrorName') }}</span>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg>
+        </a>
       </nav>
     </div>
     <dialog ref="downloadDialog" class="download-dialog" aria-labelledby="download-title" @close="restoreFocus"
