@@ -486,6 +486,19 @@ onBeforeUnmount(() => {
                                                                                 :aria-label="t('backTop')">{{
             t('backTop')
           }} <span>↑</span></a></footer>
+      <nav class="footer-projects wrap" :aria-label="t('moreApps')">
+        <span class="footer-projects-label">{{ t('moreApps') }}</span>
+        <a href="https://art-detective.netlify.app/" target="_blank" rel="noopener noreferrer">
+          <span class="footer-project-name">{{ t('artDetectiveName') }}</span>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg>
+        </a>
+        <a href="https://silver-salt.netlify.app/" target="_blank" rel="noopener noreferrer">
+          <span class="footer-project-name">{{ t('silverSaltName') }}</span>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg>
+        </a>
+      </nav>
     </div>
     <dialog ref="downloadDialog" class="download-dialog" aria-labelledby="download-title" @close="restoreFocus"
             @click="event => { if (event.target === downloadDialog) closeDownload() }">

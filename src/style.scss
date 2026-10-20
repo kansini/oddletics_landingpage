@@ -1620,6 +1620,63 @@ h2 {
   }
 }
 
+.footer-projects {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 28px;
+  padding-block: 18px 24px;
+  border-top: 1px solid var(--line);
+
+  .footer-projects-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--hero-note);
+    margin-right: 8px;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .footer-project-name {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -5px;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .2s ease;
+    }
+  }
+
+  a:hover .footer-project-name::after,
+  a:focus-visible .footer-project-name::after {
+    transform: scaleX(1);
+  }
+
+  svg { width: 16px; height: 16px; flex-shrink: 0; }
+}
+
+@media (max-width: 600px) {
+  .footer-projects {
+    gap: 4px 24px;
+
+    .footer-projects-label { flex-basis: 100%; }
+    a { min-height: 44px; }
+  }
+}
+
 .back-top {
   font-size: 10px;
   margin-left: 38px;
