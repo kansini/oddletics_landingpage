@@ -3025,6 +3025,8 @@ h2 {
 
 .final-store-buttons {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 14px;
   justify-content: center;
   margin-top: 30px;
@@ -3182,7 +3184,8 @@ h2 {
   }
 }
 
-.store-badge.store-badge-ios {
+.store-badge.store-badge-ios,
+.store-badge.store-badge-android {
   min-width: 230px;
   min-height: 72px;
   gap: 11px;
@@ -3199,6 +3202,8 @@ h2 {
     color: #080808;
     flex-shrink: 0;
   }
+
+  .android-icon { color: #287455; }
 
   > span:not(.store-arrow) {
     gap: 1px;
@@ -3638,7 +3643,8 @@ h2 {
     flex-wrap: wrap;
     align-items: center;
   }
-  .final-store-buttons .store-badge.store-badge-ios {
+  .final-store-buttons .store-badge.store-badge-ios,
+  .final-store-buttons .store-badge.store-badge-android {
     min-height: 64px;
 
     .store-icon {

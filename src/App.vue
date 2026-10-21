@@ -10,7 +10,7 @@ import DownloadBadge from './components/DownloadBadge.vue'
 import {useSitePreferences} from './composables/preferences'
 import SportsPlayground from './components/SportsPlayground.vue'
 import ThemeStadiumTransition from './components/ThemeStadiumTransition.vue'
-import {downloadUrls, getDownloadPlatforms, type DownloadPlatform} from './data/downloads'
+import {downloadNameKeys, downloadUrls, getDownloadPlatforms, type DownloadPlatform} from './data/downloads'
 import type {MessageKey} from './data/messages'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -461,9 +461,10 @@ onBeforeUnmount(() => {
           <div class="final-store-buttons">
             <DownloadBadge platform="ios" @unavailable="showDownload"/>
             <DownloadBadge platform="harmony" @unavailable="showDownload"/>
+            <DownloadBadge platform="android" @unavailable="showDownload"/>
           </div>
           <p class="download-status">{{
-              t(downloadUrls.ios || downloadUrls.harmony ? 'finalDownload' : 'storePending')
+              t(downloadUrls.ios || downloadUrls.harmony || downloadUrls.android ? 'finalDownload' : 'storePending')
             }}</p><a class="final-play-link" href="#play">{{ t('finalCta') }} <span>↗</span></a></div>
       </section>
     </main>
@@ -512,7 +513,7 @@ onBeforeUnmount(() => {
       <p class="eyebrow">WARMING UP…</p>
       <h2 id="download-title">{{ t('downloadTitle') }}</h2>
       <p class="multiline">{{
-          t('downloadText', {platform: t(pendingPlatform === 'ios' ? 'appStore' : 'harmonyStore')})
+          t('downloadText', {platform: t(downloadNameKeys[pendingPlatform])})
         }}</p><a class="button button-green" href="#play" @click="closeDownload">{{ t('goStudio') }} <span>↗</span></a>
     </dialog>
     <ThemeStadiumTransition ref="themeTransition"/>
