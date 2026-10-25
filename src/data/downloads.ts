@@ -4,8 +4,8 @@ function storeUrl(value: string | undefined): string | undefined {
   try { const url = new URL(value.trim()); return url.protocol === 'https:' ? url.href : undefined } catch { return undefined }
 }
 export const androidRelease = {
-  version: '1.6.1',
-  fileName: 'oddletics_v_1.6.1.apk',
+  version: '1.6.2',
+  fileName: 'oddletics_v_1.6.2.apk',
 }
 
 export const downloadUrls = {
